@@ -2,7 +2,7 @@
 
 > **Plan Better. Coordinate Smarter. Deliver Great Events.**  
 > *A centralized, cloud-ready event operations command center for organizers.*  
-> **Subject:** Cloud Computing | **Project Type:** Micro-Project
+
 
 ---
 
