@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EMS — Team & Volunteers Roster</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside class="app-sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">⚡</div>
+      <div class="brand-text">
+        <h2>EMS <span class="brand-glow-pill"><span class="glow-dot"></span>OPS</span></h2>
+        <div class="brand-tagline">Plan Better. Deliver Great Events.</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">COMMAND CENTER</div>
+      <a href="index.html" class="nav-link">
+        <span class="nav-icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="events.html" class="nav-link">
+        <span class="nav-icon">📅</span>
+        <span>My Events</span>
+      </a>
+      <a href="workspace.html" class="nav-link">
+        <span class="nav-icon">🚀</span>
+        <span>Event Workspace</span>
+      </a>
+
+      <div class="nav-section-title">OPERATIONS</div>
+      <a href="schedule.html" class="nav-link">
+        <span class="nav-icon">⏰</span>
+        <span>Schedule</span>
+      </a>
+      <a href="team.html" class="nav-link active">
+        <span class="nav-icon">👥</span>
+        <span>Team & Volunteers</span>
+      </a>
+      <a href="tasks.html" class="nav-link">
+        <span class="nav-icon">📋</span>
+        <span>Tasks & Checklist</span>
+      </a>
+
+      <div class="nav-section-title">RESOURCES & RELATIONS</div>
+      <a href="budget.html" class="nav-link">
+        <span class="nav-icon">💰</span>
+        <span>Budget & Finance</span>
+      </a>
+      <a href="guests.html" class="nav-link">
+        <span class="nav-icon">🎙️</span>
+        <span>Guests & Speakers</span>
+      </a>
+      <a href="announcements.html" class="nav-link">
+        <span class="nav-icon">📢</span>
+        <span>Announcements</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="system-status">
+        <span>● REST Architecture</span>
+        <span style="font-weight: 700; color: var(--brand-cyan);">Online</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Application Wrapper -->
+  <main class="app-main">
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="page-title">Event Operations Crew & Volunteers</h1>
+        <span class="badge badge-ready" id="teamCountBadge">Loading...</span>
+      </div>
+
+      <div class="header-right">
+        <button class="search-trigger-btn" onclick="openSearchModal()">
+          <span>🔍 Quick Search...</span>
+          <span class="kbd-badge">Ctrl+K</span>
+        </button>
+
+
+
+        <button class="header-btn" onclick="clearApplicationData(loadTeam)">
+          <span>🗑️ Clear (0)</span>
+        </button>
+
+        <button class="header-btn" onclick="restoreSampleData(loadTeam)">
+          <span>🔄 Restore Sample</span>
+        </button>
+
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          🌙
+        </button>
+      </div>
+    </header>
+
+    <div class="content-body">
+      <div class="controls-bar">
+        <div class="filters-group">
+          <input type="text" id="searchTeam" class="form-control" placeholder="Search team by name, role, department..." style="min-width: 260px;">
+          <select id="filterEvent" class="form-control" style="width: auto;">
+            <option value="">All Events</option>
+          </select>
+          <select id="filterRole" class="form-control" style="width: auto;">
+            <option value="">All Roles</option>
+            <option value="Event Coordinator">Event Coordinator</option>
+            <option value="Registration">Registration</option>
+            <option value="Technical Team">Technical Team</option>
+            <option value="Hospitality">Hospitality</option>
+            <option value="Stage Management">Stage Management</option>
+            <option value="Photography">Photography</option>
+            <option value="Security">Security</option>
+            <option value="Volunteer">Volunteer</option>
+          </select>
+          <select id="filterStatus" class="form-control" style="width: auto;">
+            <option value="">All Statuses</option>
+            <option value="Assigned">Assigned</option>
+            <option value="Available">Available</option>
+            <option value="Busy">Busy</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" onclick="openNewTeamModal()">+ Assign Team Member</button>
+      </div>
+
+      <div id="teamGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Add/Edit Team Member Modal -->
+  <div id="addTeamModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="teamModalTitle">👥 Assign Team Member</h3>
+        <button class="modal-close-btn" onclick="closeModal('addTeamModal')">&times;</button>
+      </div>
+      <form id="teamForm">
+        <input type="hidden" id="teamMemberId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="modalEventId">Assign to Event *</label>
+            <select id="modalEventId" class="form-control" required></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="tmName">Full Name *</label>
+            <input type="text" id="tmName" class="form-control" placeholder="e.g. Ananya Deshmukh" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="tmRole">Operational Role *</label>
+              <select id="tmRole" class="form-control" required>
+                <option value="Event Coordinator">Event Coordinator</option>
+                <option value="Registration">Registration</option>
+                <option value="Technical Team">Technical Team</option>
+                <option value="Hospitality">Hospitality</option>
+                <option value="Stage Management">Stage Management</option>
+                <option value="Photography">Photography</option>
+                <option value="Security">Security</option>
+                <option value="Volunteer">Volunteer</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tmStatus">Status</label>
+              <select id="tmStatus" class="form-control">
+                <option value="Assigned" selected>Assigned</option>
+                <option value="Available">Available</option>
+                <option value="Busy">Busy</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="tmDept">Department</label>
+              <input type="text" id="tmDept" class="form-control" placeholder="e.g. IT & Media">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="tmContact">Contact Number</label>
+              <input type="text" id="tmContact" class="form-control" placeholder="+91 98765 43210">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addTeamModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Member</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/team.js"></script>
+  <script>
+    function openNewTeamModal() {
+      document.getElementById('teamForm').reset();
+      document.getElementById('teamMemberId').value = '';
+      document.getElementById('teamModalTitle').innerText = '👥 Assign Team Member';
+      openModal('addTeamModal');
+    }
+  </script>
+</body>
+</html>

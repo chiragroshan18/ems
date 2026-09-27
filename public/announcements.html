@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EMS — Announcements & Broadcasts</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside class="app-sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">⚡</div>
+      <div class="brand-text">
+        <h2>EMS <span class="brand-glow-pill"><span class="glow-dot"></span>OPS</span></h2>
+        <div class="brand-tagline">Plan Better. Deliver Great Events.</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">COMMAND CENTER</div>
+      <a href="index.html" class="nav-link">
+        <span class="nav-icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="events.html" class="nav-link">
+        <span class="nav-icon">📅</span>
+        <span>My Events</span>
+      </a>
+      <a href="workspace.html" class="nav-link">
+        <span class="nav-icon">🚀</span>
+        <span>Event Workspace</span>
+      </a>
+
+      <div class="nav-section-title">OPERATIONS</div>
+      <a href="schedule.html" class="nav-link">
+        <span class="nav-icon">⏰</span>
+        <span>Schedule</span>
+      </a>
+      <a href="team.html" class="nav-link">
+        <span class="nav-icon">👥</span>
+        <span>Team & Volunteers</span>
+      </a>
+      <a href="tasks.html" class="nav-link">
+        <span class="nav-icon">📋</span>
+        <span>Tasks & Checklist</span>
+      </a>
+
+      <div class="nav-section-title">RESOURCES & RELATIONS</div>
+      <a href="budget.html" class="nav-link">
+        <span class="nav-icon">💰</span>
+        <span>Budget & Finance</span>
+      </a>
+      <a href="guests.html" class="nav-link">
+        <span class="nav-icon">🎙️</span>
+        <span>Guests & Speakers</span>
+      </a>
+      <a href="announcements.html" class="nav-link active">
+        <span class="nav-icon">📢</span>
+        <span>Announcements</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="system-status">
+        <span>● REST Architecture</span>
+        <span style="font-weight: 700; color: var(--brand-cyan);">Online</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Application Wrapper -->
+  <main class="app-main">
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="page-title">Broadcasts & Event Announcements</h1>
+        <span class="badge badge-ready" id="announcementsCountBadge">Loading...</span>
+      </div>
+
+      <div class="header-right">
+        <button class="search-trigger-btn" onclick="openSearchModal()">
+          <span>🔍 Quick Search...</span>
+          <span class="kbd-badge">Ctrl+K</span>
+        </button>
+
+
+
+        <button class="header-btn" onclick="clearApplicationData(loadAnnouncements)">
+          <span>🗑️ Clear (0)</span>
+        </button>
+
+        <button class="header-btn" onclick="restoreSampleData(loadAnnouncements)">
+          <span>🔄 Restore Sample</span>
+        </button>
+
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          🌙
+        </button>
+      </div>
+    </header>
+
+    <div class="content-body">
+      <!-- Controls & Filter Bar -->
+      <div class="controls-bar">
+        <div class="filters-group">
+          <input type="text" id="searchAnnouncements" class="form-control" placeholder="Search broadcasts by title or message..." style="min-width: 260px;">
+          <select id="filterEvent" class="form-control" style="width: auto;">
+            <option value="">All Events</option>
+          </select>
+          <select id="filterPriority" class="form-control" style="width: auto;">
+            <option value="">All Priorities</option>
+            <option value="Urgent">Urgent</option>
+            <option value="Important">Important</option>
+            <option value="Normal">Normal</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" onclick="openNewAnnouncementModal()">+ Publish Announcement</button>
+      </div>
+
+      <!-- Announcements List -->
+      <div id="announcementsList" style="max-width: 800px;">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Add/Edit Announcement Modal -->
+  <div id="addAnnouncementModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="annModalTitle">📢 Publish Announcement</h3>
+        <button class="modal-close-btn" onclick="closeModal('addAnnouncementModal')">&times;</button>
+      </div>
+      <form id="announcementForm">
+        <input type="hidden" id="announcementId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="modalEventId">Broadcast for Event *</label>
+            <select id="modalEventId" class="form-control" required></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="annTitle">Broadcast Title *</label>
+            <input type="text" id="annTitle" class="form-control" placeholder="e.g. AV Console Soundcheck at 4:30 PM" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="annPriority">Priority Level *</label>
+            <select id="annPriority" class="form-control" required>
+              <option value="Normal">Normal</option>
+              <option value="Important" selected>Important</option>
+              <option value="Urgent">Urgent</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="annMessage">Message Content *</label>
+            <textarea id="annMessage" class="form-control" placeholder="Detailed announcement broadcast..." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addAnnouncementModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Publish Broadcast</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/announcements.js"></script>
+  <script>
+    function openNewAnnouncementModal() {
+      document.getElementById('announcementForm').reset();
+      document.getElementById('announcementId').value = '';
+      document.getElementById('annModalTitle').innerText = '📢 Publish Announcement';
+      openModal('addAnnouncementModal');
+    }
+  </script>
+</body>
+</html>

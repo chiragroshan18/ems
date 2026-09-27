@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EMS — Event Operations Workspace</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .workspace-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid var(--border-color);
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .tab-btn {
+      padding: 10px 18px;
+      background: transparent;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .tab-btn:hover {
+      color: var(--brand-primary);
+    }
+    .tab-btn.active {
+      color: var(--brand-primary);
+      border-bottom-color: var(--brand-primary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside class="app-sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">⚡</div>
+      <div class="brand-text">
+        <h2>EMS <span class="brand-glow-pill"><span class="glow-dot"></span>OPS</span></h2>
+        <div class="brand-tagline">Plan Better. Deliver Great Events.</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">COMMAND CENTER</div>
+      <a href="index.html" class="nav-link">
+        <span class="nav-icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="events.html" class="nav-link">
+        <span class="nav-icon">📅</span>
+        <span>My Events</span>
+      </a>
+      <a href="workspace.html" class="nav-link active">
+        <span class="nav-icon">🚀</span>
+        <span>Event Workspace</span>
+      </a>
+
+      <div class="nav-section-title">OPERATIONS</div>
+      <a href="schedule.html" class="nav-link">
+        <span class="nav-icon">⏰</span>
+        <span>Schedule</span>
+      </a>
+      <a href="team.html" class="nav-link">
+        <span class="nav-icon">👥</span>
+        <span>Team & Volunteers</span>
+      </a>
+      <a href="tasks.html" class="nav-link">
+        <span class="nav-icon">📋</span>
+        <span>Tasks & Checklist</span>
+      </a>
+
+      <div class="nav-section-title">RESOURCES & RELATIONS</div>
+      <a href="budget.html" class="nav-link">
+        <span class="nav-icon">💰</span>
+        <span>Budget & Finance</span>
+      </a>
+      <a href="guests.html" class="nav-link">
+        <span class="nav-icon">🎙️</span>
+        <span>Guests & Speakers</span>
+      </a>
+      <a href="announcements.html" class="nav-link">
+        <span class="nav-icon">📢</span>
+        <span>Announcements</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="system-status">
+        <span>● REST Architecture</span>
+        <span style="font-weight: 700; color: var(--brand-cyan);">Online</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Application Wrapper -->
+  <main class="app-main">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <span style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Active Workspace:</span>
+        <select id="workspaceEventSelect" class="form-control" style="width: auto; font-weight: 700; font-size: 14px;">
+          <!-- Dynamically populated -->
+        </select>
+      </div>
+
+      <div class="header-right">
+        <button class="search-trigger-btn" onclick="openSearchModal()">
+          <span>🔍 Quick Search...</span>
+          <span class="kbd-badge">Ctrl+K</span>
+        </button>
+
+
+
+        <button class="header-btn" onclick="clearApplicationData(() => location.reload())">
+          <span>🗑️ Clear (0)</span>
+        </button>
+
+        <button class="header-btn" onclick="restoreSampleData(() => location.reload())">
+          <span>🔄 Restore Sample</span>
+        </button>
+
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          🌙
+        </button>
+      </div>
+    </header>
+
+    <!-- Content Body -->
+    <div class="content-body" id="workspaceContent">
+      <!-- Workspace Event Banner -->
+      <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+              <h2 id="wsEventTitle" style="font-size: 24px; font-weight: 800;">Loading Event...</h2>
+              <span id="wsEventStatus" class="badge badge-ready">Ready</span>
+            </div>
+            <div id="wsEventMeta" style="font-size: 13px; color: var(--text-muted);">
+              Loading event details...
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-primary btn-sm" onclick="printEventSummaryReport(currentEventId)">🖨️ Print Summary Dossier (PDF)</button>
+          </div>
+        </div>
+
+        <!-- Quick Summary Bar -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; background: var(--bg-subtle); border-radius: var(--radius-md); padding: 14px 18px;">
+          <div>
+            <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Task Progress</div>
+            <div id="wsHeaderProgress" style="font-size: 18px; font-weight: 800; color: var(--brand-primary); margin-top: 2px;">0%</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Tasks Completed</div>
+            <div id="wsHeaderTasks" style="font-size: 18px; font-weight: 800; margin-top: 2px;">0/0</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Total Spent</div>
+            <div id="wsHeaderBudget" style="font-size: 18px; font-weight: 800; margin-top: 2px;">₹0</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Assigned Crew</div>
+            <div id="wsHeaderTeam" style="font-size: 18px; font-weight: 800; margin-top: 2px;">0</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Readiness Score</div>
+            <div id="wsHeaderReadiness" style="font-size: 18px; font-weight: 800; color: var(--status-success); margin-top: 2px;">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="workspace-tabs">
+        <button class="tab-btn active" id="tabBtn-overview" onclick="switchWorkspaceTab('overview')">📌 Overview</button>
+        <button class="tab-btn" id="tabBtn-schedule" onclick="switchWorkspaceTab('schedule')">⏰ Schedule</button>
+        <button class="tab-btn" id="tabBtn-team" onclick="switchWorkspaceTab('team')">👥 Team & Volunteers</button>
+        <button class="tab-btn" id="tabBtn-tasks" onclick="switchWorkspaceTab('tasks')">📋 Tasks</button>
+        <button class="tab-btn" id="tabBtn-budget" onclick="switchWorkspaceTab('budget')">💰 Budget</button>
+        <button class="tab-btn" id="tabBtn-guests" onclick="switchWorkspaceTab('guests')">🎙️ Guests & Speakers</button>
+        <button class="tab-btn" id="tabBtn-announcements" onclick="switchWorkspaceTab('announcements')">📢 Announcements</button>
+        <button class="tab-btn" id="tabBtn-analytics" onclick="switchWorkspaceTab('analytics')">📊 Analytics</button>
+      </div>
+
+      <!-- Tab Content Panels -->
+      <div id="tabPanel-overview" class="tab-content-panel">
+        <div id="tabOverviewContent"></div>
+      </div>
+
+      <div id="tabPanel-schedule" class="tab-content-panel" style="display: none;">
+        <div id="tabScheduleContent"></div>
+      </div>
+
+      <div id="tabPanel-team" class="tab-content-panel" style="display: none;">
+        <div id="tabTeamContent"></div>
+      </div>
+
+      <div id="tabPanel-tasks" class="tab-content-panel" style="display: none;">
+        <div id="tabTasksContent"></div>
+      </div>
+
+      <div id="tabPanel-budget" class="tab-content-panel" style="display: none;">
+        <div id="tabBudgetContent"></div>
+      </div>
+
+      <div id="tabPanel-guests" class="tab-content-panel" style="display: none;">
+        <div id="tabGuestsContent"></div>
+      </div>
+
+      <div id="tabPanel-announcements" class="tab-content-panel" style="display: none;">
+        <div id="tabAnnouncementsContent"></div>
+      </div>
+
+      <div id="tabPanel-analytics" class="tab-content-panel" style="display: none;">
+        <div id="tabAnalyticsContent"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modals for Workspace Actions -->
+  <!-- 1. Add Session Modal -->
+  <div id="addSessionModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">⏰ Schedule New Session</h3>
+        <button class="modal-close-btn" onclick="closeModal('addSessionModal')">&times;</button>
+      </div>
+      <form id="addSessionForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Session Title *</label>
+            <input type="text" id="schTitle" class="form-control" placeholder="e.g. Distributed Cloud Architectures Keynote" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Start Time *</label>
+              <input type="time" id="schStart" class="form-control" value="10:00" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">End Time *</label>
+              <input type="time" id="schEnd" class="form-control" value="11:30" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Venue / Room</label>
+              <input type="text" id="schVenue" class="form-control" placeholder="e.g. Main Auditorium">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Speaker / Host</label>
+              <input type="text" id="schSpeaker" class="form-control" placeholder="e.g. Dr. Vikram Sethi">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="schDesc" class="form-control" placeholder="Session goals, topics, and prerequisites..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addSessionModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Schedule Session</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Add Team Member Modal -->
+  <div id="addTeamModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">👥 Assign Team Member</h3>
+        <button class="modal-close-btn" onclick="closeModal('addTeamModal')">&times;</button>
+      </div>
+      <form id="addTeamForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" id="tmName" class="form-control" placeholder="e.g. Rohit Sharma" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Operational Role *</label>
+              <select id="tmRole" class="form-control" required>
+                <option value="Event Coordinator">Event Coordinator</option>
+                <option value="Registration">Registration</option>
+                <option value="Technical Team">Technical Team</option>
+                <option value="Hospitality">Hospitality</option>
+                <option value="Stage Management">Stage Management</option>
+                <option value="Photography">Photography</option>
+                <option value="Security">Security</option>
+                <option value="Volunteer">Volunteer</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Department</label>
+              <input type="text" id="tmDept" class="form-control" placeholder="e.g. Operations">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Contact / Phone</label>
+              <input type="text" id="tmContact" class="form-control" placeholder="+91 98765 43210">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select id="tmStatus" class="form-control">
+                <option value="Assigned" selected>Assigned</option>
+                <option value="Available">Available</option>
+                <option value="Busy">Busy</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addTeamModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Assign Member</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Add Task Modal -->
+  <div id="addTaskModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">📋 Add Event Task</h3>
+        <button class="modal-close-btn" onclick="closeModal('addTaskModal')">&times;</button>
+      </div>
+      <form id="addTaskForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Task Name *</label>
+            <input type="text" id="tskName" class="form-control" placeholder="e.g. Test Audio Console and Wireless Microphones" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <input type="text" id="tskCat" class="form-control" placeholder="e.g. Technical Team">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Assigned Member</label>
+              <input type="text" id="tskMember" class="form-control" placeholder="e.g. Ananya Deshmukh">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Priority</label>
+              <select id="tskPriority" class="form-control">
+                <option value="Low">Low</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deadline</label>
+              <input type="date" id="tskDeadline" class="form-control">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addTaskModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Add Expense Modal -->
+  <div id="addExpenseModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">💰 Add Budget Expense</h3>
+        <button class="modal-close-btn" onclick="closeModal('addExpenseModal')">&times;</button>
+      </div>
+      <form id="addExpenseForm">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Budget Category *</label>
+              <select id="expCat" class="form-control" required>
+                <option value="Venue">Venue</option>
+                <option value="Food">Food</option>
+                <option value="Decoration">Decoration</option>
+                <option value="Equipment">Equipment</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Transportation">Transportation</option>
+                <option value="Photography">Photography</option>
+                <option value="Miscellaneous">Miscellaneous</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select id="expStatus" class="form-control">
+                <option value="Paid">Paid</option>
+                <option value="Committed">Committed</option>
+                <option value="Pending" selected>Pending</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description *</label>
+            <input type="text" id="expDesc" class="form-control" placeholder="e.g. Stage Sound Arrays & Digital Mic Kit" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Planned Amount (₹) *</label>
+              <input type="number" id="expPlanned" class="form-control" placeholder="e.g. 15000" min="0" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Actual Spent Amount (₹)</label>
+              <input type="number" id="expActual" class="form-control" placeholder="e.g. 14200" min="0" value="0">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addExpenseModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Record Expense</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Add Guest/Speaker Modal -->
+  <div id="addGuestModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">🎙️ Register Guest / Speaker</h3>
+        <button class="modal-close-btn" onclick="closeModal('addGuestModal')">&times;</button>
+      </div>
+      <form id="addGuestForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" id="gstName" class="form-control" placeholder="e.g. Dr. Vikram Sethi" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Designation</label>
+              <input type="text" id="gstDesignation" class="form-control" placeholder="e.g. Chief Cloud Architect">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Organization</label>
+              <input type="text" id="gstOrg" class="form-control" placeholder="e.g. Global Tech Labs">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Presentation Topic / Keynote</label>
+            <input type="text" id="gstTopic" class="form-control" placeholder="e.g. Evolution of Scalable Microservices">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Contact / Email</label>
+              <input type="text" id="gstContact" class="form-control" placeholder="speaker@domain.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirmation Status</label>
+              <select id="gstStatus" class="form-control">
+                <option value="Confirmed" selected>Confirmed</option>
+                <option value="Pending">Pending</option>
+                <option value="Declined">Declined</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addGuestModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Register Speaker</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6. Add Announcement Modal -->
+  <div id="addAnnouncementModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">📢 Publish Announcement</h3>
+        <button class="modal-close-btn" onclick="closeModal('addAnnouncementModal')">&times;</button>
+      </div>
+      <form id="addAnnouncementForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Broadcast Title *</label>
+            <input type="text" id="annTitle" class="form-control" placeholder="e.g. AV Console Soundcheck at 4:30 PM" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Priority Level *</label>
+            <select id="annPriority" class="form-control" required>
+              <option value="Normal">Normal</option>
+              <option value="Important" selected>Important</option>
+              <option value="Urgent">Urgent</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message Details *</label>
+            <textarea id="annMessage" class="form-control" placeholder="Enter broadcast message details for crew and delegates..." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addAnnouncementModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Publish Announcement</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/workspace.js"></script>
+</body>
+</html>

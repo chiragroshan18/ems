@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EMS — Tasks & Operations Checklist</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside class="app-sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">⚡</div>
+      <div class="brand-text">
+        <h2>EMS <span class="brand-glow-pill"><span class="glow-dot"></span>OPS</span></h2>
+        <div class="brand-tagline">Plan Better. Deliver Great Events.</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">COMMAND CENTER</div>
+      <a href="index.html" class="nav-link">
+        <span class="nav-icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="events.html" class="nav-link">
+        <span class="nav-icon">📅</span>
+        <span>My Events</span>
+      </a>
+      <a href="workspace.html" class="nav-link">
+        <span class="nav-icon">🚀</span>
+        <span>Event Workspace</span>
+      </a>
+
+      <div class="nav-section-title">OPERATIONS</div>
+      <a href="schedule.html" class="nav-link">
+        <span class="nav-icon">⏰</span>
+        <span>Schedule</span>
+      </a>
+      <a href="team.html" class="nav-link">
+        <span class="nav-icon">👥</span>
+        <span>Team & Volunteers</span>
+      </a>
+      <a href="tasks.html" class="nav-link active">
+        <span class="nav-icon">📋</span>
+        <span>Tasks & Checklist</span>
+      </a>
+
+      <div class="nav-section-title">RESOURCES & RELATIONS</div>
+      <a href="budget.html" class="nav-link">
+        <span class="nav-icon">💰</span>
+        <span>Budget & Finance</span>
+      </a>
+      <a href="guests.html" class="nav-link">
+        <span class="nav-icon">🎙️</span>
+        <span>Guests & Speakers</span>
+      </a>
+      <a href="announcements.html" class="nav-link">
+        <span class="nav-icon">📢</span>
+        <span>Announcements</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="system-status">
+        <span>● REST Architecture</span>
+        <span style="font-weight: 700; color: var(--brand-cyan);">Online</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Application Wrapper -->
+  <main class="app-main">
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="page-title">Operations Checklist & Task Execution</h1>
+        <span class="badge badge-ready" id="tasksCountBadge">Loading...</span>
+      </div>
+
+      <div class="header-right">
+        <button class="search-trigger-btn" onclick="openSearchModal()">
+          <span>🔍 Quick Search...</span>
+          <span class="kbd-badge">Ctrl+K</span>
+        </button>
+
+
+
+        <button class="header-btn" onclick="clearApplicationData(loadTasks)">
+          <span>🗑️ Clear (0)</span>
+        </button>
+
+        <button class="header-btn" onclick="restoreSampleData(loadTasks)">
+          <span>🔄 Restore Sample</span>
+        </button>
+
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          🌙
+        </button>
+      </div>
+    </header>
+
+    <div class="content-body">
+      <!-- Dynamic Progress Banner -->
+      <div class="readiness-banner" style="margin-bottom: 24px; padding: 20px 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h3 style="font-size: 16px; font-weight: 700;">Task Completion Progress</h3>
+            <div id="tasksCountsText" style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+              Calculating completion statistics...
+            </div>
+          </div>
+          <div id="tasksProgressText" style="font-size: 24px; font-weight: 800; color: var(--brand-primary);">
+            0% Complete
+          </div>
+        </div>
+        <div class="readiness-progress-track" style="margin-bottom: 0;">
+          <div id="tasksProgressFill" class="readiness-progress-fill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- Controls & Filter Bar -->
+      <div class="controls-bar">
+        <div class="filters-group">
+          <input type="text" id="searchTasks" class="form-control" placeholder="Search tasks, assigned member..." style="min-width: 250px;">
+          <select id="filterEvent" class="form-control" style="width: auto;">
+            <option value="">All Events</option>
+          </select>
+          <select id="filterPriority" class="form-control" style="width: auto;">
+            <option value="">All Priorities</option>
+            <option value="Critical">Critical</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+          <select id="filterStatus" class="form-control" style="width: auto;">
+            <option value="">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+          </select>
+          <select id="sortTasks" class="form-control" style="width: auto;">
+            <option value="deadline">Sort: Deadline</option>
+            <option value="priority">Sort: Priority</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" onclick="openNewTaskModal()">+ Add New Task</button>
+      </div>
+
+      <!-- Tasks Table -->
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Task Details</th>
+              <th>Category</th>
+              <th>Assignee</th>
+              <th>Priority</th>
+              <th>Deadline</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="tasksTableBody">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add/Edit Task Modal -->
+  <div id="addTaskModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="taskModalTitle">📋 Add New Task</h3>
+        <button class="modal-close-btn" onclick="closeModal('addTaskModal')">&times;</button>
+      </div>
+      <form id="taskForm">
+        <input type="hidden" id="taskId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="modalEventId">Assign to Event *</label>
+            <select id="modalEventId" class="form-control" required></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="taskName">Task Name *</label>
+            <input type="text" id="taskName" class="form-control" placeholder="e.g. Test Audio Console and Wireless Microphones" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="taskCategory">Category</label>
+              <input type="text" id="taskCategory" class="form-control" placeholder="e.g. Technical Team">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="taskMember">Assigned Member</label>
+              <input type="text" id="taskMember" class="form-control" placeholder="e.g. Ananya Deshmukh">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="taskPriority">Priority</label>
+              <select id="taskPriority" class="form-control">
+                <option value="Low">Low</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="taskDeadline">Deadline</label>
+              <input type="date" id="taskDeadline" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="taskStatus">Status</label>
+            <select id="taskStatus" class="form-control">
+              <option value="Pending" selected>Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="taskNotes">Notes & Deliverables</label>
+            <textarea id="taskNotes" class="form-control" placeholder="Key instructions or vendor contact details..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addTaskModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/tasks.js"></script>
+  <script>
+    function openNewTaskModal() {
+      document.getElementById('taskForm').reset();
+      document.getElementById('taskId').value = '';
+      document.getElementById('taskModalTitle').innerText = '📋 Add New Task';
+      openModal('addTaskModal');
+    }
+  </script>
+</body>
+</html>

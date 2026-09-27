@@ -1,0 +1,13 @@
+{
+  "name": "ems",
+  "version": "1.0.0",
+  "description": "EMS - Event Management System (Cloud Computing Micro-Project)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/test-suite.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

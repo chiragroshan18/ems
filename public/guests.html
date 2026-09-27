@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EMS — Guests & Speakers Management</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside class="app-sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">⚡</div>
+      <div class="brand-text">
+        <h2>EMS <span class="brand-glow-pill"><span class="glow-dot"></span>OPS</span></h2>
+        <div class="brand-tagline">Plan Better. Deliver Great Events.</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">COMMAND CENTER</div>
+      <a href="index.html" class="nav-link">
+        <span class="nav-icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="events.html" class="nav-link">
+        <span class="nav-icon">📅</span>
+        <span>My Events</span>
+      </a>
+      <a href="workspace.html" class="nav-link">
+        <span class="nav-icon">🚀</span>
+        <span>Event Workspace</span>
+      </a>
+
+      <div class="nav-section-title">OPERATIONS</div>
+      <a href="schedule.html" class="nav-link">
+        <span class="nav-icon">⏰</span>
+        <span>Schedule</span>
+      </a>
+      <a href="team.html" class="nav-link">
+        <span class="nav-icon">👥</span>
+        <span>Team & Volunteers</span>
+      </a>
+      <a href="tasks.html" class="nav-link">
+        <span class="nav-icon">📋</span>
+        <span>Tasks & Checklist</span>
+      </a>
+
+      <div class="nav-section-title">RESOURCES & RELATIONS</div>
+      <a href="budget.html" class="nav-link">
+        <span class="nav-icon">💰</span>
+        <span>Budget & Finance</span>
+      </a>
+      <a href="guests.html" class="nav-link active">
+        <span class="nav-icon">🎙️</span>
+        <span>Guests & Speakers</span>
+      </a>
+      <a href="announcements.html" class="nav-link">
+        <span class="nav-icon">📢</span>
+        <span>Announcements</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="system-status">
+        <span>● REST Architecture</span>
+        <span style="font-weight: 700; color: var(--brand-cyan);">Online</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Application Wrapper -->
+  <main class="app-main">
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="page-title">Honored Guests & Keynote Speakers</h1>
+        <span class="badge badge-ready" id="guestsCountBadge">Loading...</span>
+      </div>
+
+      <div class="header-right">
+        <button class="search-trigger-btn" onclick="openSearchModal()">
+          <span>🔍 Quick Search...</span>
+          <span class="kbd-badge">Ctrl+K</span>
+        </button>
+
+
+
+        <button class="header-btn" onclick="clearApplicationData(loadGuests)">
+          <span>🗑️ Clear (0)</span>
+        </button>
+
+        <button class="header-btn" onclick="restoreSampleData(loadGuests)">
+          <span>🔄 Restore Sample</span>
+        </button>
+
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          🌙
+        </button>
+      </div>
+    </header>
+
+    <div class="content-body">
+      <!-- Controls & Filter Bar -->
+      <div class="controls-bar">
+        <div class="filters-group">
+          <input type="text" id="searchGuests" class="form-control" placeholder="Search speaker name, organization, topic..." style="min-width: 260px;">
+          <select id="filterEvent" class="form-control" style="width: auto;">
+            <option value="">All Events</option>
+          </select>
+          <select id="filterStatus" class="form-control" style="width: auto;">
+            <option value="">All Confirmation Statuses</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Pending">Pending</option>
+            <option value="Declined">Declined</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" onclick="openNewGuestModal()">+ Register Speaker</button>
+      </div>
+
+      <!-- Speakers Grid -->
+      <div id="guestsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Add/Edit Guest Modal -->
+  <div id="addGuestModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="guestModalTitle">🎙️ Register Guest / Speaker</h3>
+        <button class="modal-close-btn" onclick="closeModal('addGuestModal')">&times;</button>
+      </div>
+      <form id="guestForm">
+        <input type="hidden" id="guestId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="modalEventId">Assign to Event *</label>
+            <select id="modalEventId" class="form-control" required></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="gstName">Full Name *</label>
+            <input type="text" id="gstName" class="form-control" placeholder="e.g. Dr. Vikram Sethi" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="gstDesignation">Designation</label>
+              <input type="text" id="gstDesignation" class="form-control" placeholder="e.g. Chief Cloud Architect">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="gstOrg">Organization</label>
+              <input type="text" id="gstOrg" class="form-control" placeholder="e.g. Global Tech Labs">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="gstTopic">Presentation Topic / Keynote</label>
+            <input type="text" id="gstTopic" class="form-control" placeholder="e.g. Evolution of Scalable Microservices">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="gstSession">Assigned Session</label>
+              <input type="text" id="gstSession" class="form-control" placeholder="e.g. Opening Keynote">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="gstContact">Contact / Email</label>
+              <input type="text" id="gstContact" class="form-control" placeholder="speaker@domain.com">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="gstStatus">Confirmation Status</label>
+            <select id="gstStatus" class="form-control">
+              <option value="Confirmed" selected>Confirmed</option>
+              <option value="Pending">Pending</option>
+              <option value="Declined">Declined</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addGuestModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Speaker</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/guests.js"></script>
+  <script>
+    function openNewGuestModal() {
+      document.getElementById('guestForm').reset();
+      document.getElementById('guestId').value = '';
+      document.getElementById('guestModalTitle').innerText = '🎙️ Register Guest / Speaker';
+      openModal('addGuestModal');
+    }
+  </script>
+</body>
+</html>

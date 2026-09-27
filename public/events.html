@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EMS — My Events Management</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside class="app-sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">⚡</div>
+      <div class="brand-text">
+        <h2>EMS <span class="brand-glow-pill"><span class="glow-dot"></span>OPS</span></h2>
+        <div class="brand-tagline">Plan Better. Deliver Great Events.</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">COMMAND CENTER</div>
+      <a href="index.html" class="nav-link">
+        <span class="nav-icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="events.html" class="nav-link active">
+        <span class="nav-icon">📅</span>
+        <span>My Events</span>
+      </a>
+      <a href="workspace.html" class="nav-link">
+        <span class="nav-icon">🚀</span>
+        <span>Event Workspace</span>
+      </a>
+
+      <div class="nav-section-title">OPERATIONS</div>
+      <a href="schedule.html" class="nav-link">
+        <span class="nav-icon">⏰</span>
+        <span>Schedule</span>
+      </a>
+      <a href="team.html" class="nav-link">
+        <span class="nav-icon">👥</span>
+        <span>Team & Volunteers</span>
+      </a>
+      <a href="tasks.html" class="nav-link">
+        <span class="nav-icon">📋</span>
+        <span>Tasks & Checklist</span>
+      </a>
+
+      <div class="nav-section-title">RESOURCES & RELATIONS</div>
+      <a href="budget.html" class="nav-link">
+        <span class="nav-icon">💰</span>
+        <span>Budget & Finance</span>
+      </a>
+      <a href="guests.html" class="nav-link">
+        <span class="nav-icon">🎙️</span>
+        <span>Guests & Speakers</span>
+      </a>
+      <a href="announcements.html" class="nav-link">
+        <span class="nav-icon">📢</span>
+        <span>Announcements</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="system-status">
+        <span>● REST Architecture</span>
+        <span style="font-weight: 700; color: var(--brand-cyan);">Online</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Application Wrapper -->
+  <main class="app-main">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="page-title">Event Operations & Management</h1>
+        <span class="badge badge-ready" id="eventsCountBadge">Loading...</span>
+      </div>
+
+      <div class="header-right">
+        <button class="search-trigger-btn" onclick="openSearchModal()">
+          <span>🔍 Quick Search...</span>
+          <span class="kbd-badge">Ctrl+K</span>
+        </button>
+
+
+
+        <button class="header-btn" onclick="clearApplicationData(loadEvents)">
+          <span>🗑️ Clear (0)</span>
+        </button>
+
+        <button class="header-btn" onclick="restoreSampleData(loadEvents)">
+          <span>🔄 Restore Sample</span>
+        </button>
+
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+          🌙
+        </button>
+      </div>
+    </header>
+
+    <!-- Content Body -->
+    <div class="content-body">
+      <!-- Controls & Filter Bar -->
+      <div class="controls-bar">
+        <div class="filters-group">
+          <input type="text" id="searchEvents" class="form-control" placeholder="Search events by name, venue, organizer..." style="min-width: 260px;">
+
+          <select id="filterStatus" class="form-control" style="width: auto;">
+            <option value="">All Statuses</option>
+            <option value="Planning">Planning</option>
+            <option value="Ready">Ready</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+
+          <select id="filterType" class="form-control" style="width: auto;">
+            <option value="">All Event Types</option>
+            <option value="Conference">Conference</option>
+            <option value="Workshop">Workshop</option>
+            <option value="Seminar">Seminar</option>
+            <option value="College Fest">College Fest</option>
+            <option value="Corporate Meet">Corporate Meet</option>
+            <option value="Cultural Event">Cultural Event</option>
+            <option value="Sports Event">Sports Event</option>
+            <option value="Exhibition">Exhibition</option>
+          </select>
+
+          <select id="sortEvents" class="form-control" style="width: auto;">
+            <option value="newest">Sort: Newest Date</option>
+            <option value="oldest">Sort: Oldest Date</option>
+            <option value="name">Sort: Alphabetical</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" onclick="openModal('addEventModal')">+ Create Event</button>
+      </div>
+
+      <!-- Events Grid -->
+      <div id="eventsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
+        <!-- Dynamically rendered -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Create Event Modal -->
+  <div id="addEventModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">📅 Create New Event</h3>
+        <button class="modal-close-btn" onclick="closeModal('addEventModal')">&times;</button>
+      </div>
+      <form id="createEventForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="evtName">Event Name *</label>
+            <input type="text" id="evtName" class="form-control" placeholder="e.g. Asia Cloud & AI Summit 2026" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="evtType">Event Type *</label>
+              <select id="evtType" class="form-control" required>
+                <option value="Conference">Conference</option>
+                <option value="Workshop">Workshop</option>
+                <option value="Seminar">Seminar</option>
+                <option value="College Fest">College Fest</option>
+                <option value="Corporate Meet">Corporate Meet</option>
+                <option value="Cultural Event">Cultural Event</option>
+                <option value="Sports Event">Sports Event</option>
+                <option value="Exhibition">Exhibition</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="evtStatus">Initial Status</label>
+              <select id="evtStatus" class="form-control">
+                <option value="Planning" selected>Planning</option>
+                <option value="Ready">Ready</option>
+                <option value="In Progress">In Progress</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="evtVenue">Venue & Location *</label>
+            <input type="text" id="evtVenue" class="form-control" placeholder="e.g. Hall 3, Silicon Convention Center" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="evtDate">Event Date *</label>
+              <input type="date" id="evtDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="evtOrganizer">Organizer / Host *</label>
+              <input type="text" id="evtOrganizer" class="form-control" placeholder="e.g. Cloud Architecture Guild" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="evtStartTime">Start Time</label>
+              <input type="time" id="evtStartTime" class="form-control" value="09:00">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="evtEndTime">End Time</label>
+              <input type="time" id="evtEndTime" class="form-control" value="17:00">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="evtParticipants">Expected Participants</label>
+              <input type="number" id="evtParticipants" class="form-control" placeholder="e.g. 350" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="evtBudget">Planned Budget (₹)</label>
+              <input type="number" id="evtBudget" class="form-control" placeholder="e.g. 75000" min="0">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="evtDescription">Event Description</label>
+            <textarea id="evtDescription" class="form-control" placeholder="Overview of the event agenda, target audience, and primary objectives..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addEventModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Event</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Event Modal -->
+  <div id="editEventModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">✏️ Edit Event Details</h3>
+        <button class="modal-close-btn" onclick="closeModal('editEventModal')">&times;</button>
+      </div>
+      <form id="editEventForm">
+        <input type="hidden" id="editEvtId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="editEvtName">Event Name *</label>
+            <input type="text" id="editEvtName" class="form-control" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="editEvtType">Event Type *</label>
+              <select id="editEvtType" class="form-control" required>
+                <option value="Conference">Conference</option>
+                <option value="Workshop">Workshop</option>
+                <option value="Seminar">Seminar</option>
+                <option value="College Fest">College Fest</option>
+                <option value="Corporate Meet">Corporate Meet</option>
+                <option value="Cultural Event">Cultural Event</option>
+                <option value="Sports Event">Sports Event</option>
+                <option value="Exhibition">Exhibition</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="editEvtStatus">Status</label>
+              <select id="editEvtStatus" class="form-control">
+                <option value="Planning">Planning</option>
+                <option value="Ready">Ready</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="editEvtVenue">Venue & Location *</label>
+            <input type="text" id="editEvtVenue" class="form-control" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="editEvtDate">Event Date *</label>
+              <input type="date" id="editEvtDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="editEvtOrganizer">Organizer / Host *</label>
+              <input type="text" id="editEvtOrganizer" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="editEvtStartTime">Start Time</label>
+              <input type="time" id="editEvtStartTime" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="editEvtEndTime">End Time</label>
+              <input type="time" id="editEvtEndTime" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="editEvtParticipants">Expected Participants</label>
+              <input type="number" id="editEvtParticipants" class="form-control" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="editEvtBudget">Planned Budget (₹)</label>
+              <input type="number" id="editEvtBudget" class="form-control" min="0">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="editEvtDescription">Event Description</label>
+            <textarea id="editEvtDescription" class="form-control"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('editEventModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/events.js"></script>
+</body>
+</html>
